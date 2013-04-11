@@ -17,7 +17,7 @@ Also see the posts about the idea.
  * [WordPress Feed für Entwürfe](http://bueltge.de/wordpress-feed-fuer-entwuerfe/829/), in german language
 
 ### Screenshots
- 1. [Different areas on the dashboard, there will be removed](https://raw.github.com/bueltge/Remove-Comments-Absolutely/master/screenshot-1.png)
+ ![Dashboard Widget Example](https://raw.github.com/bueltge/Drafts-Feed/master/screenshot-1.png "Dashboard Widget Example")
 
 ## Other Notes
 ### Bugs, technical hints or contribute
