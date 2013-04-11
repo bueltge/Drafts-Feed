@@ -1,8 +1,8 @@
 # Drafts Feed
-WordPress Plugin, that add a new Feed for drafts and a dashbaord widget to list all drafts from all authors.
+WordPress Plugin, that add a new Feed for drafts and a dashboard widget to list all drafts from all authors.
 
 ## Description
-We are already working with four authors at WPEngineer – so it's quite useful to have a feed for drafts and everybody can look at it. If someone is writing a new post and saves as draft everybody get immediately notified via feed.
+We are already working with four authors at [WPEngineer](http://wpengineer.com) – so it's quite useful to have a feed for drafts and everybody can look at it. If someone is writing a new post and saves as draft everybody get immediately notified via feed.
 
 There is also the possibility to get notified via email, but I thought it's more convenient to let everybody know about new drafts through our feed reader. That's why I checked out how to create your own feed. With the help of the loop you can do quite a lot, as you can see in our previous post „Customize Your WordPress-Feeds“.
 
@@ -22,7 +22,7 @@ Also see the posts about the idea.
 ## Other Notes
 ### Bugs, technical hints or contribute
 Please give me feedback, contribute and file technical bugs on this 
-[GitHub Repo](https://github.com/bueltge/Remove-Comments-Absolutely/issues), use Issues.
+[GitHub Repo](https://github.com/bueltge/Drafts-Feed/issues), use Issues.
 
 ### License
 Good news, this plugin is free for everyone! Since it's released under the GPL, 
