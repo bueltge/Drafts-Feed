@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Drafts Feed
  * Plugin URI:  http://bueltge.de/wordpress-feed-fuer-entwuerfe/829/
- * Description: Add a new Feed for drafts: <code>/?feed=drafts</code>
+ * Description: Add a new Feed for drafts: <code>/?feed=drafts</code> or with active permalinks <code>/feed/drafts</code>
  * Version:     1.0.1
  * Author:      Frank Bültge
  * Author URI:  http://bueltge.de/

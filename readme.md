@@ -10,7 +10,8 @@ You are welcome to use the following small Plugin (download link at the end of t
 
 Feed doesn't have an access protection – that makes reading with several online tools easy and simple.
 
-The Plugin creates a feed, which is available at http://example.com/?feed=draft.
+The Plugin creates a feed, which is available at `http://example.com/?feed=drafts` or with active permalinks on `http://example.com/feed/drafts/`.
+You can change this string on the var `feed_slug`.
 
 Also see the posts about the idea.
  * [Feed for Drafts](http://wpengineer.com/424/feed-for-drafts-plugin/), in english language
