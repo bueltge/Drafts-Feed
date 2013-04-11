@@ -24,6 +24,8 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		
 		protected static $classobj = NULL;
 		
+		public static $feed_slug = 'drafts';
+		
 		/**
 		* Handler for the action 'init'. Instantiates this class.
 		* 
@@ -45,6 +47,8 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		public function __construct() {
 			
 			add_action( 'init', array( &$this, 'add_draft_feed' ) );
+			
+			add_action( 'pre_get_posts', array( $this, 'feed_content' ) );
 			
 			if ( is_admin() ) {
 				add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget') );
@@ -71,15 +75,42 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 */
 		public function get_drafts( $posts_per_page = 5 ) {
 			
-			$drafts_query = new WP_Query( array(
-				'post_type' => 'post',
-				'post_status' => 'draft',
-				'posts_per_page' => $posts_per_page,
-				'orderby' => 'modified',
-				'order' => 'DESC'
-			) );
+			$args = array(
+				'post_type'      => 'post',
+				'post_status'    => 'draft',
+				'posts_per_page' => (int) $posts_per_page,
+				'orderby'        => 'modified',
+				'order'          => 'DESC'
+			);
+			
+			$drafts_query = new WP_Query( $args );
 			
 			return $drafts_query->posts;
+		}
+		
+		/**
+		 * Customizes the query.
+		 * It will bail if $query is not an object, filters are suppressed 
+		 * and it's not our feed query.
+		 *
+		 * @param  WP_Query $query The current query
+		 * @return void
+		 */
+		public function feed_content( $query ) {
+			// Bail if $query is not an object or of incorrect class
+			if ( ! $query instanceof WP_Query )
+				return;
+
+			// Bail if filters are suppressed on this query
+			if ( $query->get( 'suppress_filters' ) )
+				return;
+			
+			// Bail if it's not our feed
+			if ( ! $query->is_feed( self::$feed_slug ) )
+				return;
+			
+			$query->set( 'post_status', array( 'draft' ) );
+			$query->set( 'orderby', 'modified' );
 		}
 		
 		/**
@@ -163,7 +194,8 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		
 		
 		/**
-		 * Add feed with key 'drafts'
+		 * Add feed with key
+		 * Use as key the var $feed_strings
 		 * 
 		 * @return  void
 		 */
@@ -171,81 +203,17 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			
 			// set name for the feed
 			// http://examble.com/?feed=drafts
-			add_feed( 'drafts', array( $this, 'get_draft_feed') );
+			add_feed( self::$feed_slug, array( $this, 'get_feed_template' ) );
 		}
 		
-		
 		/**
-		 * Create RSS2 feed
+		 * Loads the feed template
 		 * 
-		 * @return void
+		 * @return  void
 		 */
-		public function get_draft_feed() {
+		public function get_feed_template() {
 			
-			$items = $this->get_drafts( 20 );
-			
-			if ( ! headers_sent() )
-				header( 'Content-Type: text/xml; charset=' . get_option( 'blog_charset' ), TRUE );
-			$more = 1;
-		
-		echo '<?xml version="1.0" encoding="' . get_option( 'blog_charset' ) . '"?' . '>'; ?>
-
-<rss version="2.0"
-	xmlns:content="http://purl.org/rss/1.0/modules/content/"
-	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-	xmlns:atom="http://www.w3.org/2005/Atom"
-	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-	<?php do_action('rss2_ns'); ?>
->
-
-<channel>
-	<title><?php bloginfo_rss( 'name' ); wp_title_rss(); ?></title>
-	<atom:link href="<?php self_link(); ?>" rel="self" type="application/rss+xml" />
-	<link><?php bloginfo_rss( 'url' ) ?></link>
-	<description><?php bloginfo_rss( 'description' ) ?></description>
-	<pubDate><?php echo mysql2date( 'D, d M Y H:i:s +0000', get_lastpostmodified('GMT'), false ); ?></pubDate>
-	<generator>http://bueltge.de/</generator>
-	<language><?php echo get_option( 'rss_language' ); ?></language>
-	<sy:updatePeriod><?php echo apply_filters( 'rss_update_period', 'hourly' ); ?></sy:updatePeriod>
-	<sy:updateFrequency><?php echo apply_filters( 'rss_update_frequency', '1' ); ?></sy:updateFrequency>
-	<?php do_action('rss2_head'); ?>
-	<?php
-	if ( empty($items) ) {
-		echo '<!-- No submissions found yet. //-->';
-	} else {
-		foreach ($items as $item) {
-	?>
-		<item>
-			<title><?php echo stripslashes( apply_filters( 'comment_author', $item->post_title ) ); ?></title>
-			<link><?php echo stripslashes( apply_filters( 'comment_author_url', get_permalink($item->ID) ) ); ?></link>
-			<pubDate><?php echo mysql2date( 'D, d M Y H:i:s +0000', $item->post_date ); ?></pubDate>
-			<dc:creator><?php echo stripslashes( apply_filters('comment_author', $item->post_author) ); ?></dc:creator>
-
-			<guid isPermaLink="false"><?php echo stripslashes( 
-				apply_filters('comment_author_url', $item->guid)
-			); ?></guid>
-			<?php if ( $item->post_excerpt != '' ) { ?>
-			<description><![CDATA[<?php echo trim(
-				stripslashes( apply_filters('comment_text', $item->post_excerpt) )
-			); ?>]]></description>
-			<?php } else { ?>
-			<description><![CDATA[<?php echo strip_tags(
-				trim( stripslashes( apply_filters('comment_text', $item->post_content) ) )
-			); ?>]]></description>
-			<?php } ?>
-			<content:encoded><![CDATA[<?php echo trim(
-				stripslashes( apply_filters( 'comment_text', $item->post_content ) )
-			); ?>]]></content:encoded>
-			<?php do_action( 'rss2_item' ); ?>
-		</item>
-	<?php
-		} 
-	}
-	?>
-	</channel>
-</rss>
-	<?php
+			load_template( ABSPATH . WPINC . '/feed-rss2.php' );
 		}
 	
 	} // end class
