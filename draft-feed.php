@@ -180,7 +180,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			$output .= "\n";
 			$output .= '<style type="text/css">'."\n";
 			$output .= '<!--'."\n";
-			$output .= '#dashboard_recent_drafts abbr {' . "\n";
+			$output .= '#dashboard_recent_all_drafts abbr {' . "\n";
 			$output .= 'font-family: "Lucida Grande", Verdana, Arial, "Bitstream Vera Sans", sans-serif;' . "\n";;
 			$output .= 'font-size: 11px;' . "\n";
 			$output .= 'color: #999;' . "\n";
