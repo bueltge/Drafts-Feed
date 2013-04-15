@@ -158,7 +158,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		public function add_dashboard_widget() {
 			
 			wp_add_dashboard_widget(
-				'dashboard_recent_all_drafts',
+				'dashboard_recent_drafts_all_authors',
 				__( 'Recents Drafts', 'draft_feed' ) . ' <small>' 
 				 . __( 'of all authors', 'draft_feed' ) . '</small>',
 				array( $this, 'dashboard_recent_drafts')
