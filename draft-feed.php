@@ -7,7 +7,7 @@
  * Author:      Frank Bültge
  * Author URI:  http://bueltge.de/
  * Licence:     GPLv3
- * Last Change: 04/11/2013
+ * Last Change: 04/15/2013
  */
 
 //avoid direct calls to this file, because now WP core and framework has been used
@@ -45,14 +45,15 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 * @return  void
 		 */
 		public function __construct() {
-			
-			add_action( 'init', array( &$this, 'add_draft_feed' ) );
-			
+			// add custom feed
+			add_action( 'init', array( $this, 'add_draft_feed' ) );
+			// change query for custom feed
 			add_action( 'pre_get_posts', array( $this, 'feed_content' ) );
 			
 			if ( is_admin() ) {
+				// add dashboard widget
 				add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget') );
-				add_action( 'admin_head', array( $this, 'add_my_css') );
+				// add multilingual possibility, load lang file
 				add_action( 'admin_init', array( $this, 'textdomain') );
 			}
 		}
@@ -121,10 +122,8 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 */
 		public function dashboard_recent_drafts( $drafts = FALSE ) {
 			
-			if ( $drafts )
-				return;
-				
-			$drafts = $this->get_drafts();
+			if ( ! $drafts )
+				$drafts = $this->get_drafts();
 			
 			if ( $drafts && is_array( $drafts ) ) {
 				
@@ -134,12 +133,9 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 					$title  = _draft_or_post_title( $draft->ID );
 					$user   = get_userdata($draft->post_author);
 					$author = $user->display_name;
-					$item   = '<a href="' . $url . '" title="'
-						. sprintf( __( 'Edit &#8220;%s&#8221;', 'draft_feed' ), esc_attr( $title ) ) . '">' 
-						. $title . '</a> ' . __( 'by', 'draft_feed' ) . ' ' 
-						. stripslashes( apply_filters( 'comment_author', $author ) ) 
-						. ' <abbr title="' . get_the_time( __( 'Y/m/d g:i:s A' ), $draft ) . '">' 
-						. get_the_time( get_option( 'date_format' ), $draft ) . '</abbr>';
+					$item = "<h4><a href='$url' title='" . sprintf( __( 'Edit &#8220;%s&#8221;' ), esc_attr( $title ) ) . "'>" . esc_html($title) . "</a> <small><abbr title='" . get_the_time(__('Y/m/d g:i:s A'), $draft) . "'>" . get_the_time( get_option( 'date_format' ), $draft ) . '</abbr></small></h4>';
+					if ( $the_content = preg_split( '#[\r\n\t ]#', strip_tags( $draft->post_content ), 11, PREG_SPLIT_NO_EMPTY ) )
+						$item .= '<p>' . join( ' ', array_slice( $the_content, 0, 10 ) ) . ( 10 < count( $the_content ) ? '&hellip;' : '' ) . '</p>';
 					$list[] = $item;
 				}
 			?>
@@ -168,30 +164,6 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 				array( $this, 'dashboard_recent_drafts')
 			);
 		}
-		
-		/**
-		 * Add custom css, inline
-		 * 
-		 * @return  String $output
-		 */
-		public function add_my_css() {
-			
-			$output  = '';
-			$output .= "\n";
-			$output .= '<style type="text/css">'."\n";
-			$output .= '<!--'."\n";
-			$output .= '#dashboard_recent_all_drafts abbr {' . "\n";
-			$output .= 'font-family: "Lucida Grande", Verdana, Arial, "Bitstream Vera Sans", sans-serif;' . "\n";;
-			$output .= 'font-size: 11px;' . "\n";
-			$output .= 'color: #999;' . "\n";
-			$output .= 'margin-left: 3px;' . "\n";
-			$output .= '}'."\n";
-			$output .= '-->'."\n";
-			$output .= '</style>'."\n";
-			
-			echo $output;
-		}
-		
 		
 		/**
 		 * Add feed with key
