@@ -3,11 +3,11 @@
  * Plugin Name: Drafts Feed
  * Plugin URI:  http://bueltge.de/wordpress-feed-fuer-entwuerfe/829/
  * Description: Add a new Feed for drafts: <code>/?feed=drafts</code> or with active permalinks <code>/feed/drafts</code>
- * Version:     1.0.1
+ * Version:     1.1.0
  * Author:      Frank Bültge
  * Author URI:  http://bueltge.de/
- * Licence:     GPLv3
- * Last Change: 04/15/2013
+ * Licence:     GPLv2
+ * Last Change: 03/04/2014
  */
 
 //avoid direct calls to this file, because now WP core and framework has been used
@@ -22,11 +22,11 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 	
 	class Draft_Feed {
 		
-		protected static $classobj = NULL;
+		protected static $classobj  = NULL;
 		
-		public static $feed_slug = 'drafts';
+		public static $feed_slug    = 'drafts';
 		
-		public static $widget_slug = 'dashboard_recent_drafts_all_authors';
+		public static $widget_slug  = 'dashboard_recent_drafts_all_authors';
 		
 		public static $options_slug = 'draft_feed_options';
 		
@@ -72,6 +72,11 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 * @return  void
 		 */
 		public function textdomain() {
+			
+			$locale = get_locale();
+			
+			if ( 'en_US' === $locale )
+				return;
 			
 			load_plugin_textdomain( 'draft_feed', FALSE, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 		}
