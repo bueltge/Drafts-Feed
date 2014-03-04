@@ -26,6 +26,10 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		
 		public static $feed_slug = 'drafts';
 		
+		public static $widget_slug = 'dashboard_recent_drafts_all_authors';
+		
+		public static $options_slug = 'draft_feed_options';
+		
 		/**
 		* Handler for the action 'init'. Instantiates this class.
 		* 
@@ -34,7 +38,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		*/
 		public static function init() {
 			
-			NULL === self::$classobj and self::$classobj = new self();
+			NULL === self::$classobj && self::$classobj = new self();
 			
 			return self::$classobj;
 		}
@@ -45,18 +49,21 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 * @return  void
 		 */
 		public function __construct() {
-			// add custom feed
-			add_action( 'init', array( $this, 'add_draft_feed' ) );
-			// change query for custom feed
-			add_action( 'pre_get_posts', array( $this, 'feed_content' ) );
 			
-			// mabye hook context?
-			if ( is_admin() ) {
-				// add dashboard widget
-				add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget') );
-				// add multilingual possibility, load lang file
-				add_action( 'admin_init', array( $this, 'textdomain') );
+			$options = $this->get_options();
+			
+			// if options allow the draft feed
+			if ( 1 === $options[ 'feed' ] ) {
+				// add custom feed
+				add_action( 'init', array( $this, 'add_draft_feed' ) );
+				// change query for custom feed
+				add_action( 'pre_get_posts', array( $this, 'feed_content' ) );
 			}
+			
+			// add dashboard widget
+			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget') );
+			// add multilingual possibility, load lang file
+			add_action( 'admin_init', array( $this, 'textdomain') );
 		}
 		
 		/**
@@ -66,7 +73,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 */
 		public function textdomain() {
 			
-			load_plugin_textdomain( 'draft_feed', FALSE, dirname( plugin_basename(__FILE__) ) . '/languages' );
+			load_plugin_textdomain( 'draft_feed', FALSE, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 		}
 		
 		/**
@@ -75,12 +82,14 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		 * @param   Integer $post_per_page for count of drafts
 		 * @return  Array 
 		 */
-		public function get_drafts( $posts_per_page = 5 ) {
+		public function get_drafts() {
+			
+			$options = $this->get_options();
 			
 			$args = array(
 				'post_type'      => 'post',
 				'post_status'    => 'draft',
-				'posts_per_page' => (int) $posts_per_page,
+				'posts_per_page' => $options[ 'posts_per_page' ],
 				'orderby'        => 'modified',
 				'order'          => 'DESC'
 			);
@@ -128,6 +137,8 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			
 			if ( $drafts && is_array( $drafts ) ) {
 				
+				$count = (int) wp_count_posts()->draft;
+				
 				$list = array();
 				foreach ( $drafts as $draft ) {
 					$url    = get_edit_post_link( $draft->ID );
@@ -143,12 +154,71 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			<ul>
 				<li><?php echo join( "</li>\n<li>", $list ); ?></li>
 			</ul>
-			<p class="textright"><a href="edit.php?post_status=draft" class="button"><?php _e( 'View all', 'draft_feed' ); ?></a></p>
+			<p class="textright"><a href="edit.php?post_status=draft" class="button"><?php printf( __( 'View all %d', 'draft_feed' ), $count ); ?></a></p>
 			<?php
 			} else {
 				
 				_e( 'There are no drafts at the moment', 'draft_feed' );
 			}
+		}
+		
+		/**
+		 * Control for settings
+		 * 
+		 * @return String
+		 */
+		public function widget_settings() {
+			
+			$options = $this->get_options();
+			
+			// validate and update options
+			if ( 'post' == strtolower( $_SERVER['REQUEST_METHOD'] ) 
+					 && isset( $_POST[ 'widget_id' ] ) && self::$widget_slug == $_POST[ 'widget_id' ]
+					) {
+				
+				// reset
+				$options[ 'feed' ] = 0;
+				
+				if (  $_POST[ 'feed' ] )
+					$options[ 'feed' ] = (int) $_POST[ 'feed' ];
+				
+				if (  $_POST[ 'posts_per_page' ] )
+					$options[ 'posts_per_page' ] = (int) $_POST[ 'posts_per_page' ];
+				
+				update_option( self::$options_slug, $options );
+			}
+			?>
+			<p>
+				<label>
+					<input type="checkbox" name="feed" value="1" <?php checked( 1, $options[ 'feed' ] ); ?> /> <?php _e( 'Create Draft Feed?', 'draft_feed' ); ?>
+				</label>
+			</p>
+			<p>
+				<label for="posts_per_page">
+					<input type="text" id="posts_per_page" name="posts_per_page" value="<?php esc_attr_e( $options[ 'posts_per_page' ] ); ?>" size="2" /> <?php _e( 'How many items show inside the dashboard widget?', 'draft_feed' ); ?>
+				</label>
+			</p>
+			<?php
+		}
+		
+		/**
+		 * Get options
+		 * 
+		 * @return  Array
+		 */
+		public function get_options() {
+			
+			$defaults = array(
+				'feed'           => 1,
+				'posts_per_page' => 5
+			);
+			
+			$args = wp_parse_args(
+				get_option( self::$options_slug ),
+				apply_filters( 'draft_feed_options', $defaults )
+			);
+			
+			return $args;
 		}
 		
 		/**
@@ -159,10 +229,11 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 		public function add_dashboard_widget() {
 			
 			wp_add_dashboard_widget(
-				'dashboard_recent_drafts_all_authors',
-				__( 'Recents Drafts', 'draft_feed' ) . ' <small>' 
-				 . __( 'of all authors', 'draft_feed' ) . '</small>',
-				array( $this, 'dashboard_recent_drafts')
+				self::$widget_slug,
+				__( 'Recents Drafts', 'draft_feed' ) . 
+				' <small>' . __( 'of all authors', 'draft_feed' ) . '</small>',
+				array( $this, 'dashboard_recent_drafts' ), // content
+				array( $this, 'widget_settings' ) // control
 			);
 		}
 		
