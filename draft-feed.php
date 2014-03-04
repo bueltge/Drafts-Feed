@@ -50,6 +50,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			// change query for custom feed
 			add_action( 'pre_get_posts', array( $this, 'feed_content' ) );
 			
+			// mabye hook context?
 			if ( is_admin() ) {
 				// add dashboard widget
 				add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget') );
