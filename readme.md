@@ -19,7 +19,8 @@ Also see the posts about the idea.
 
 ### Screenshots
  ![Dashboard Widget Example](https://raw.github.com/bueltge/Drafts-Feed/master/screenshot-1.png "Dashboard Widget Example")
-
+ ![Dashboard Widget Settings](https://raw.github.com/bueltge/Drafts-Feed/master/screenshot-2.png "Dashboard Widget Settings")
+ 
 ## Other Notes
 ### Bugs, technical hints or contribute
 Please give me feedback, contribute and file technical bugs on this 

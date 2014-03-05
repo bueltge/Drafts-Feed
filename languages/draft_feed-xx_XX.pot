@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drafts Feed\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-04 17:02+0100\n"
+"POT-Creation-Date: 2014-03-05 10:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Frank Bueltge <frank@bueltge.de>\n"
 "Language-Team: \n"
@@ -12,40 +12,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: ../\n"
-"X-Generator: Poedit 1.6.3\n"
+"X-Generator: Poedit 1.6.4\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: draft-feed.php:153
+#: draft-feed.php:157
 #, php-format
 msgid "Edit &#8220;%s&#8221;"
 msgstr "&#8220;%s&#8221; bearbeiten"
 
-#: draft-feed.php:153
+#: draft-feed.php:158
+#, php-format
+msgid "by %s, "
+msgstr "von %s, "
+
+#: draft-feed.php:158
 msgid "Y/m/d g:i:s A"
 msgstr "Y/m/d g:i:s A"
 
-#: draft-feed.php:162
+#: draft-feed.php:171
 #, php-format
 msgid "View all %d"
 msgstr "Zeige alle %d Entwürfe"
 
-#: draft-feed.php:166
+#: draft-feed.php:175
 msgid "There are no drafts at the moment"
 msgstr "Im Moment gibt es keine Entwürfe"
 
-#: draft-feed.php:198
+#: draft-feed.php:210
 msgid "Create Draft Feed?"
 msgstr "Erstelle einen Feed für Entwürfe?"
 
-#: draft-feed.php:203
+#: draft-feed.php:215
+msgid "Show only the title inside the dashboard widget?"
+msgstr "Zeige nur den Title innerhalb des Widget?"
+
+#: draft-feed.php:220
 msgid "How many items show inside the dashboard widget?"
 msgstr "Wieviele Entwürfe sollen im Widget angezeigt werden?"
 
-#: draft-feed.php:238
+#: draft-feed.php:256
 msgid "Recents Drafts"
 msgstr "Aktuelle Entwürfe"
 
-#: draft-feed.php:239
+#: draft-feed.php:257
 msgid "of all authors"
 msgstr "aller Autoren"
 

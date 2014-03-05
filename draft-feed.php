@@ -7,7 +7,7 @@
  * Author:      Frank Bültge
  * Author URI:  http://bueltge.de/
  * Licence:     GPLv2
- * Last Change: 03/04/2014
+ * Last Change: 03/05/2014
  */
 
 //avoid direct calls to this file, because now WP core and framework has been used
@@ -142,17 +142,26 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			
 			if ( $drafts && is_array( $drafts ) ) {
 				
-				$count = (int) wp_count_posts()->draft;
+				// Get options
+				$options = $this->get_options();
+				// Count all draft posts
+				$count   = (int) wp_count_posts()->draft;
 				
 				$list = array();
 				foreach ( $drafts as $draft ) {
+					
 					$url    = get_edit_post_link( $draft->ID );
 					$title  = _draft_or_post_title( $draft->ID );
-					$user   = get_userdata($draft->post_author);
+					$user   = get_userdata( $draft->post_author );
 					$author = $user->display_name;
-					$item = "<h4><a href='$url' title='" . sprintf( __( 'Edit &#8220;%s&#8221;' ), esc_attr( $title ) ) . "'>" . esc_html($title) . "</a> <small><abbr title='" . get_the_time(__('Y/m/d g:i:s A'), $draft) . "'>" . get_the_time( get_option( 'date_format' ), $draft ) . '</abbr></small></h4>';
-					if ( $the_content = preg_split( '#[\r\n\t ]#', strip_tags( $draft->post_content ), 11, PREG_SPLIT_NO_EMPTY ) )
+					$item = "<h4><a href='$url' title='" . sprintf( __( 'Edit &#8220;%s&#8221;' ), esc_attr( $title ) ) . "'>" 
+						. esc_html( $title ) . "</a> <small>" . sprintf( __( 'by %s, ', 'draft_feed' ), esc_attr( $author ) ) . "<abbr title='" . get_the_time( __( 'Y/m/d g:i:s A' ), $draft ) . "'>" 
+						. get_the_time( get_option( 'date_format' ), $draft ) . '</abbr></small></h4>';
+					
+					if ( 0 === $options[ 'only_title' ]
+						   && $the_content = preg_split( '#[\r\n\t ]#', strip_tags( $draft->post_content ), 11, PREG_SPLIT_NO_EMPTY ) )
 						$item .= '<p>' . join( ' ', array_slice( $the_content, 0, 10 ) ) . ( 10 < count( $the_content ) ? '&hellip;' : '' ) . '</p>';
+						
 					$list[] = $item;
 				}
 			?>
@@ -182,10 +191,13 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 					) {
 				
 				// reset
-				$options[ 'feed' ] = 0;
+				$options[ 'feed' ] = $options[ 'only_title' ] = 0;
 				
-				if (  $_POST[ 'feed' ] )
+				if ( $_POST[ 'feed' ] )
 					$options[ 'feed' ] = (int) $_POST[ 'feed' ];
+				
+				if ( $_POST[ 'only_title' ] )
+					$options[ 'only_title' ] = (int) $_POST[ 'only_title' ];
 				
 				if (  $_POST[ 'posts_per_page' ] )
 					$options[ 'posts_per_page' ] = (int) $_POST[ 'posts_per_page' ];
@@ -194,8 +206,13 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			}
 			?>
 			<p>
-				<label>
-					<input type="checkbox" name="feed" value="1" <?php checked( 1, $options[ 'feed' ] ); ?> /> <?php _e( 'Create Draft Feed?', 'draft_feed' ); ?>
+				<label for="feed">
+					<input type="checkbox" id="feed" name="feed" value="1" <?php checked( 1, $options[ 'feed' ] ); ?> /> <?php _e( 'Create Draft Feed?', 'draft_feed' ); ?>
+				</label>
+			</p>
+			<p>
+				<label for="only_title">
+					<input type="checkbox" id="only_title" name="only_title" value="1" <?php checked( 1, $options[ 'only_title' ] ); ?> /> <?php _e( 'Show only the title inside the dashboard widget?', 'draft_feed' ); ?>
 				</label>
 			</p>
 			<p>
@@ -215,6 +232,7 @@ if ( ! class_exists( 'Draft_Feed' ) ) {
 			
 			$defaults = array(
 				'feed'           => 1,
+				'only_title'     => 1,
 				'posts_per_page' => 5
 			);
 			
