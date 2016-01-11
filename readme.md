@@ -20,7 +20,13 @@ Also see the posts about the idea.
 ### Screenshots
  ![Dashboard Widget Example](https://raw.github.com/bueltge/Drafts-Feed/master/screenshot-1.png "Dashboard Widget Example")
  ![Dashboard Widget Settings](https://raw.github.com/bueltge/Drafts-Feed/master/screenshot-2.png "Dashboard Widget Settings")
- 
+
+## Installing
+ * Download the plugin as a [ZIP file](https://github.com/bueltge/Drafts-Feed/archive/master.zip) from GitHub.
+ * In your WordPress admin click Plugin --> Add New --> Upload Plugin.
+ * Upload the ZIP file.
+ * Activate the plugin.
+
 ## Other Notes
 ### Bugs, technical hints or contribute
 Please give me feedback, contribute and file technical bugs on this 
